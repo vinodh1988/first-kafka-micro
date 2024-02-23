@@ -10,13 +10,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.kafkaapps.entities.Person;
+import com.kafkaapps.entities.Task;
 
 @Configuration
 public class KafkaConfiguration {
-	
+	{
+		System.out.println("Loaded");
+	}
   @Bean 
   public ProducerFactory<String,Person> producerFactory() {
 	 Map<String,Object> config = new HashMap<>(); 
@@ -30,10 +33,27 @@ public class KafkaConfiguration {
 	 
   }
   
-  @Bean
-  public KafkaTemplate<String,Person> kafkaTemplate() {
-	return new KafkaTemplate<> (producerFactory());  
+  @Bean 
+  public ProducerFactory<String,Task> producerFactoryTask() {
+	 Map<String,Object> config = new HashMap<>(); 
+	 config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+	 config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+	 config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+			 
+			 
+			
+	 return new DefaultKafkaProducerFactory<>(config);
+	 
   }
   
-
+  @Bean
+  public KafkaTemplate<String,Person> kafkaTemplate() {
+	return new KafkaTemplate<String,Person> (producerFactory());  
+  }
+  
+  @Bean
+  public KafkaTemplate<String,Task> kafkaTemplateTask() {
+	return new KafkaTemplate<String,Task> (producerFactoryTask());  
+  }
+  
 }
